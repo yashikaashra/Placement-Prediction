@@ -22,7 +22,7 @@ form.addEventListener('submit', async function (event) {
   };
 
   try {
-    const response = await fetch('https://placement-prediction-y29i.onrender.com/predict', {
+    const response = await fetch('https://placement-prediction-c69p.onrender.com/predict', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(studentData)
