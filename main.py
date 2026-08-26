@@ -1,10 +1,18 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
 import numpy as np
 model = joblib.load('api/placement_rf_model.pkl')
 scaler = joblib.load('api/placement_scaler.pkl')
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://yashikaashra.github.io"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 class StudentData(BaseModel):
     CGPA: float
     Internships: int
