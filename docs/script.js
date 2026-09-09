@@ -91,9 +91,17 @@ async function getSkillRecommendations(studentData) {
       }
     );
 
+    if (!response.ok) {
+      console.error(
+        'Skill recommendation server returned:',
+        response.status
+      );
+      return [];
+    }
+
     const data = await response.json();
 
-    return data.recommendations;
+    return data.recommendations || [];
 
   } catch (error) {
     console.error('Skill recommendation failed:', error);
