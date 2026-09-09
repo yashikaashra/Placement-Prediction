@@ -80,6 +80,31 @@ form.addEventListener('submit', async function (event) {
 
 async function getSkillRecommendations(studentData) {
   try {
+    const recommendationData = {
+      Age: studentData.Age,
+      Gender: studentData.Gender === 1 ? "Male" : "Female",
+      CGPA: studentData.CGPA,
+      Internships: studentData.Internships,
+      Projects: studentData.Projects,
+      Coding_Skills: studentData.Coding_Skills,
+      Communication_Skills: studentData.Communication_Skills,
+      Aptitude_Test_Score: studentData.Aptitude_Test_Score,
+      Soft_Skills_Rating: studentData.Soft_Skills_Rating,
+      Certifications: studentData.Certifications,
+      Backlogs: studentData.Backlogs,
+
+      Branch:
+        studentData.Branch_Civil === 1 ? "Civil" :
+        studentData.Branch_ECE === 1 ? "ECE" :
+        studentData.Branch_IT === 1 ? "IT" :
+        "ME",
+
+      Degree:
+        studentData.Degree_BTech === 1 ? "B.Tech" :
+        studentData.Degree_BCA === 1 ? "BCA" :
+        "MCA"
+    };
+
     const response = await fetch(
       'https://placement-prediction-y29i.onrender.com/recommend-skills',
       {
@@ -87,7 +112,7 @@ async function getSkillRecommendations(studentData) {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(studentData)
+        body: JSON.stringify(recommendationData)
       }
     );
 
