@@ -201,8 +201,7 @@ def ai_analysis(student: Student):
     prompt = f"""
 You are a career guidance assistant for a college placement prediction platform.
 
-Analyze the following student's profile and provide realistic, personalized
-career guidance.
+Analyze the following student's profile and provide concise, personalized career guidance.
 
 Student profile:
 - Age: {student.Age}
@@ -218,41 +217,53 @@ Student profile:
 - Branch: {student.Branch}
 - Degree: {student.Degree}
 
-Requirements:
+Return:
+- One overall summary of 2-3 sentences.
+- Exactly 4 strengths.
+- Exactly 3 areas to improve.
+- Exactly 3 practical next actions.
 
-- Give an overall assessment in 2-3 sentences.
-- Give 4-6 meaningful strengths.
-- Give 3-5 meaningful areas to improve.
-- Give 3-5 practical next actions.
+IMPORTANT CONTENT RULES:
 
-Quality requirements:
+1. Each strength must cover a DIFFERENT category:
+   - Academic performance
+   - Technical or analytical ability
+   - Communication or soft skills
+   - Practical exposure
 
-- Do not repeat the same fact or recommendation across multiple points.
-- Every item must provide a distinct insight.
-- Do not restate the same metric in multiple items unless it adds a genuinely
-  different insight.
-- Base the response only on the information provided.
-- Do not invent achievements, experience, skills, qualifications, project
-  subjects, project types, internship types, or career goals.
-- Do not describe the projects or internships as technical unless that
-  information was explicitly provided.
-- Do not assume that the student's branch determines their desired career.
-- A student from a non-CS branch may pursue software, IT, data, analytics,
-  automation, consulting, core engineering, or other technology roles.
-- Consider the student's demonstrated skills, academic profile, projects,
-  internships, aptitude, communication, and soft skills when suggesting
-  career directions.
-- Certifications and suggested skills should be relevant to the student's
-  demonstrated profile and may support either domain-specific or
-  technology-oriented career paths.
-- Do not recommend a career direction solely because of the student's branch.
-- Use the student's actual numerical values when mentioning scores.
-- Keep the guidance concise, practical, realistic, and suitable for college
-  placement preparation.
-- Do not include stray words, unfinished phrases, or unrelated text.
-- Every item must be a complete, grammatically correct sentence.
+2. Each improvement must address a DIFFERENT issue.
+   Do not describe coding, certifications, or soft skills more than once.
+
+3. Each action must correspond to a DIFFERENT improvement.
+   Do not repeat the same recommendation using different wording.
+
+4. Do not repeat the same student attribute in multiple points.
+   For example, do not mention the CGPA in two different strengths.
+
+5. Do not simply restate the student's numerical values.
+   Use the values only when they add useful context.
+
+6. Do not invent achievements, experience, skills, qualifications, project
+   subjects, project types, internship types, or career goals.
+
+7. Do not describe projects or internships as technical unless that was
+   explicitly provided.
+
+8. Do not assume that the student's branch determines their career.
+   A non-CS student may target software, IT, data, analytics, automation,
+   consulting, core engineering, or other technology roles.
+
+9. Suggestions must be relevant to the student's actual profile and should
+   support realistic placement preparation.
+
+10. Every point must provide a distinct insight.
+    Do not generate semantically duplicate statements.
+
+11. Do not include stray words, unfinished phrases, headings, numbering,
+    or unrelated text inside individual list items.
+
+12. Every list item must be one concise, complete sentence.
 """
-
 
     # ==========================================
     # GEMINI MODEL FALLBACK
