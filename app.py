@@ -83,7 +83,7 @@ def predict(student: Student):
     degree_bca = 1 if student.Degree == "BCA" else 0
     degree_mca = 1 if student.Degree == "MCA" else 0
 
-    # Create feature dataframe in the same order used during training
+    # Create feature dataframe
     student_data = pd.DataFrame([{
         "Age": student.Age,
         "Gender": gender,
@@ -105,7 +105,7 @@ def predict(student: Student):
         "Degree_MCA": degree_mca
     }])
 
-    # Scale the features
+    # Scale features
     scaled_data = scaler.transform(student_data)
 
     # Generate prediction
@@ -254,18 +254,57 @@ Quality requirements:
 """
 
 
-    response = client.models.generate_content(
-        model="gemini-3.6-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=AIAnalysis
-        )
-    )
+    # ==========================================
+    # GEMINI MODEL FALLBACK
+    # ==========================================
+
+    models_to_try = [
+        "gemini-3.6-flash",
+        "gemini-3.5-flash-lite"
+    ]
+
+    response = None
+    last_error = None
+
+    for model_name in models_to_try:
+
+        try:
+
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=AIAnalysis
+                )
+            )
+
+            print(
+                f"Gemini model {model_name} succeeded."
+            )
+
+            break
+
+        except Exception as error:
+
+            last_error = error
+
+            print(
+                f"Gemini model {model_name} failed: {error}"
+            )
+
+
+    # If every model failed, return the last error
+    if response is None:
+        raise last_error
+
+
+    # ==========================================
+    # PARSE STRUCTURED AI RESPONSE
+    # ==========================================
 
     result = AIAnalysis.model_validate_json(
         response.text
     )
 
     return result.model_dump()
-
