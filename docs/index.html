@@ -96,15 +96,38 @@
       <button type="submit">Predict My Placement</button>
     </form>
 
-    <div id="result" class="result hidden">
-      <h2>Predicted Placement Probability</h2>
-      <div class="probability" id="probabilityValue">--%</div>
-    </div>
-    <div id="skillBox" class="skill-box hidden">
-      <h2>Recommended Areas to Improve</h2>
-      <ul id="skillList"></ul>
-    </div>
+   <div id="result" class="result hidden">
+
+  <h2>Placement Analysis</h2>
+
+  <div class="prediction-status" id="predictionStatus">
+    --
   </div>
+
+  <div class="probability" id="probabilityValue">
+    --%
+  </div>
+
+  <div class="analysis-section">
+    <h3>Profile Strengths</h3>
+    <ul id="strengthList"></ul>
+  </div>
+
+  <div class="analysis-section">
+    <h3>Areas to Improve</h3>
+    <ul id="improvementList"></ul>
+  </div>
+
+</div>
+
+<div id="skillBox" class="skill-box hidden">
+
+  <h2>Recommended Actions</h2>
+
+  <ul id="skillList"></ul>
+
+</div>
+  
 
   <script src="script.js"></script>
 </body>

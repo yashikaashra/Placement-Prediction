@@ -1,128 +1,179 @@
-* {
+** {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Segoe UI', sans-serif;
-}
+  }
 
 body {
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+background: linear-gradient(135deg, #1a1a2e, #16213e);
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 20px;
 }
 
 .container {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 40px;
-  max-width: 480px;
-  width: 100%;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+background: #ffffff;
+border-radius: 16px;
+padding: 40px;
+max-width: 520px;
+width: 100%;
+box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 h1 {
-  font-size: 24px;
-  color: #1a1a2e;
-  margin-bottom: 6px;
+font-size: 24px;
+color: #1a1a2e;
+margin-bottom: 6px;
 }
 
 .subtitle {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 24px;
+color: #666;
+font-size: 14px;
+margin-bottom: 24px;
 }
 
 .form-group {
-  margin-bottom: 16px;
+margin-bottom: 16px;
 }
 
 label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 6px;
+display: block;
+font-size: 13px;
+font-weight: 600;
+color: #333;
+margin-bottom: 6px;
 }
 
-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
+input,
+select {
+width: 100%;
+padding: 10px 12px;
+border: 1px solid #ccc;
+border-radius: 8px;
+font-size: 14px;
+outline: none;
+background: white;
+transition: border-color 0.2s;
 }
 
-input:focus {
-  border-color: #4e54c8;
+input:focus,
+select:focus {
+border-color: #4e54c8;
 }
 
 button {
-  width: 100%;
-  padding: 12px;
-  background: #4e54c8;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 8px;
-  transition: background 0.2s;
+width: 100%;
+padding: 12px;
+background: #4e54c8;
+color: white;
+border: none;
+border-radius: 8px;
+font-size: 15px;
+font-weight: 600;
+cursor: pointer;
+margin-top: 8px;
+transition: background 0.2s;
 }
 
 button:hover {
-  background: #3b3fa1;
+background: #3b3fa1;
 }
 
+/* =========================
+PLACEMENT ANALYSIS
+========================= */
+
 .result {
-  margin-top: 24px;
-  padding: 20px;
-  background: #f0f4ff;
-  border-radius: 12px;
-  text-align: center;
+margin-top: 24px;
+padding: 24px;
+background: #f0f4ff;
+border-radius: 12px;
+text-align: center;
 }
 
 .result h2 {
-  font-size: 14px;
-  color: #444;
-  margin-bottom: 8px;
+font-size: 16px;
+color: #333;
+margin-bottom: 12px;
+}
+
+.prediction-status {
+font-size: 22px;
+font-weight: 700;
+color: #4e54c8;
+margin-bottom: 4px;
 }
 
 .probability {
-  font-size: 40px;
-  font-weight: 700;
-  color: #4e54c8;
+font-size: 42px;
+font-weight: 700;
+color: #4e54c8;
+margin-bottom: 20px;
 }
 
-.hidden {
-  display: none;
+/* =========================
+PROFILE ANALYSIS
+========================= */
+
+.analysis-section {
+background: white;
+border-radius: 10px;
+padding: 16px;
+margin-top: 14px;
+text-align: left;
 }
+
+.analysis-section h3 {
+font-size: 14px;
+color: #333;
+margin-bottom: 10px;
+}
+
+.analysis-section ul {
+padding-left: 20px;
+}
+
+.analysis-section li {
+font-size: 13px;
+color: #444;
+margin-bottom: 7px;
+}
+
+/* =========================
+RECOMMENDED ACTIONS
+========================= */
 
 .skill-box {
-  margin-top: 20px;
-  padding: 20px;
-  background: #fff8e6;
-  border-radius: 12px;
-  text-align: left;
+margin-top: 20px;
+padding: 20px;
+background: #fff8e6;
+border-radius: 12px;
+text-align: left;
 }
 
 .skill-box h2 {
-  font-size: 14px;
-  color: #444;
-  margin-bottom: 10px;
+font-size: 15px;
+color: #444;
+margin-bottom: 12px;
 }
 
 .skill-box ul {
-  padding-left: 20px;
+padding-left: 20px;
 }
 
 .skill-box li {
-  font-size: 13px;
-  color: #333;
-  margin-bottom: 8px;
+font-size: 13px;
+color: #333;
+margin-bottom: 8px;
+}
+
+/* =========================
+HIDE ELEMENTS
+========================= */
+
+.hidden {
+display: none;
 }
