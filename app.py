@@ -1,3 +1,5 @@
+from google.genai import types
+from pydantic import BaseModel
 from google import genai
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,6 +34,12 @@ class Student(BaseModel):
     Backlogs: int
     Branch: str
     Degree: str
+
+class AIAnalysis(BaseModel):
+    summary: str
+    strengths: list[str]
+    improvements: list[str]
+    actions: list[str]
 
 
 @app.post("/predict")
@@ -131,7 +139,7 @@ def ai_analysis(student: Student):
     prompt = f"""
 You are a career guidance assistant for a college placement prediction platform.
 
-Analyze this student's profile and give a concise, personalized career analysis.
+Analyze the following student's profile and provide realistic, personalized career guidance.
 
 Student profile:
 - Age: {student.Age}
@@ -148,22 +156,26 @@ Student profile:
 - Branch: {student.Branch}
 - Degree: {student.Degree}
 
-Give:
-1. A 2-3 sentence overall assessment.
-2. The student's top 2 strengths.
-3. The student's top 2 areas to improve.
-4. Two practical actions they should take next.
+Return:
+- A concise overall assessment in 2-3 sentences.
+- Exactly 2 important strengths.
+- Exactly 2 important areas to improve.
+- Exactly 2 practical next actions.
 
-Do not invent achievements or information not provided.
-Keep the response supportive, realistic, and concise.
+Base your response only on the information provided.
+Do not invent achievements, experience, skills, or qualifications.
+Keep the advice realistic, supportive, and suitable for college placements.
 """
 
     response = client.models.generate_content(
         model="gemini-3.6-flash",
-        contents=prompt
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=AIAnalysis
+        )
     )
 
-    return {
-        "analysis": response.text
-    }
+    result = AIAnalysis.model_validate_json(response.text)
 
+    return result.model_dump()
