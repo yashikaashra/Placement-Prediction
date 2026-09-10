@@ -156,15 +156,23 @@ Student profile:
 - Branch: {student.Branch}
 - Degree: {student.Degree}
 
-Return:
-- A concise overall assessment in 2-3 sentences.
-- Exactly 2 important strengths.
-- Exactly 2 important areas to improve.
-- Exactly 2 practical next actions.
-
-Base your response only on the information provided.
-Do not invent achievements, experience, skills, or qualifications.
-Keep the advice realistic, supportive, and suitable for college placements.
+Requirements:
+- Give an overall assessment in 2-3 sentences.
+- Give 4-6 meaningful strengths.
+- Give 3-5 meaningful areas to improve.
+- Give 3-5 practical next actions.
+- Do not repeat the same fact or recommendation across multiple points.
+- Prioritize the most important observations instead of repeating numbers.
+- Base the response only on the information provided.
+- Do not invent achievements, experience, skills, qualifications, or career goals.
+- Do not assume that the student's branch determines their desired career.
+- A student from a non-CS branch may pursue software, IT, data, analytics,
+  automation, consulting, core engineering, or other technology roles.
+- Consider the student's demonstrated skills, projects, internships, aptitude,
+  communication, and academic performance when suggesting career directions.
+- Certifications and suggested skills should be relevant to the student's
+  demonstrated profile and should not be restricted to their academic branch.
+- Keep the guidance concise, practical, realistic, and suitable for college placements.
 """
 
     response = client.models.generate_content(
