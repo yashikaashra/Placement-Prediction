@@ -1,3 +1,4 @@
+
 const form = document.getElementById('predictForm');
 const resultBox = document.getElementById('result');
 const probabilityValue = document.getElementById('probabilityValue');
@@ -9,127 +10,213 @@ form.addEventListener('submit', async function (event) {
   const degree = document.getElementById('degree').value;
   const gender = document.getElementById('gender').value;
 
+  // Send the original values to the backend.
+  // FastAPI will handle the encoding for the ML model.
   const studentData = {
     Age: parseInt(document.getElementById('age').value),
-    Gender: gender === 'Male' ? 1 : 0,
+
+    Gender: gender,
 
     CGPA: parseFloat(document.getElementById('cgpa').value),
     Internships: parseInt(document.getElementById('internships').value),
     Projects: parseInt(document.getElementById('projects').value),
-    Coding_Skills: parseInt(document.getElementById('codingSkills').value),
-    Communication_Skills: parseInt(document.getElementById('communicationSkills').value),
-    Aptitude_Test_Score: parseInt(document.getElementById('aptitude').value),
-    Soft_Skills_Rating: parseInt(document.getElementById('softSkills').value),
-    Certifications: parseInt(document.getElementById('certifications').value),
-    Backlogs: parseInt(document.getElementById('backlogs').value),
 
-    Branch_Civil: branch === 'Civil' ? 1 : 0,
-    Branch_ECE: branch === 'ECE' ? 1 : 0,
-    Branch_IT: branch === 'IT' ? 1 : 0,
-    Branch_ME: branch === 'ME' ? 1 : 0,
+    Coding_Skills: parseFloat(
+      document.getElementById('codingSkills').value
+    ),
 
-    Degree_BTech: degree === 'B.Tech' ? 1 : 0,
-    Degree_BCA: degree === 'BCA' ? 1 : 0,
-    Degree_MCA: degree === 'MCA' ? 1 : 0
+    Communication_Skills: parseFloat(
+      document.getElementById('communicationSkills').value
+    ),
+
+    Aptitude_Test_Score: parseFloat(
+      document.getElementById('aptitude').value
+    ),
+
+    Soft_Skills_Rating: parseFloat(
+      document.getElementById('softSkills').value
+    ),
+
+    Certifications: parseInt(
+      document.getElementById('certifications').value
+    ),
+
+    Backlogs: parseInt(
+      document.getElementById('backlogs').value
+    ),
+
+    Branch: branch,
+
+    Degree: degree
   };
 
+  console.log('Student data being sent:', studentData);
+
   try {
+
+    // ==============================
+    // PREDICT PLACEMENT
+    // ==============================
+
     const response = await fetch(
       'https://placement-prediction-c69p.onrender.com/predict',
       {
         method: 'POST',
+
         headers: {
           'Content-Type': 'application/json'
         },
+
         body: JSON.stringify(studentData)
       }
     );
 
     if (!response.ok) {
+      const errorText = await response.text();
+
+      console.error(
+        'Prediction server returned:',
+        response.status,
+        errorText
+      );
+
       throw new Error(`Server returned ${response.status}`);
     }
 
     const data = await response.json();
 
-    const probabilityPercent = data.placement_probability.toFixed(1);
+    console.log('Prediction response:', data);
 
-    probabilityValue.textContent = probabilityPercent + '%';
+
+    // ==============================
+    // DISPLAY PROBABILITY
+    // ==============================
+
+    // Backend returns probability like:
+    // 0.04 = 4%
+    const probabilityPercent =
+      (data.probability * 100).toFixed(1);
+
+    probabilityValue.textContent =
+      probabilityPercent + '%';
+
     resultBox.classList.remove('hidden');
 
-    const recommendations = await getSkillRecommendations(studentData);
-    const skillList = document.getElementById('skillList');
+
+    // ==============================
+    // GET SKILL RECOMMENDATIONS
+    // ==============================
+
+    const recommendations =
+      await getSkillRecommendations(studentData);
+
+    const skillList =
+      document.getElementById('skillList');
 
     skillList.innerHTML = '';
 
-    recommendations.forEach(function (tip) {
-      const li = document.createElement('li');
-      li.textContent = tip;
-      skillList.appendChild(li);
-    });
+    if (recommendations.length === 0) {
 
-    document.getElementById('skillBox').classList.remove('hidden');
+      const li = document.createElement('li');
+
+      li.textContent =
+        'No recommendations available right now.';
+
+      skillList.appendChild(li);
+
+    } else {
+
+      recommendations.forEach(function (tip) {
+
+        const li = document.createElement('li');
+
+        li.textContent = tip;
+
+        skillList.appendChild(li);
+
+      });
+    }
+
+    document
+      .getElementById('skillBox')
+      .classList.remove('hidden');
+
 
   } catch (error) {
-    console.error('Prediction failed:', error);
-    alert('Something went wrong. Check the console for details.');
+
+    console.error(
+      'Prediction failed:',
+      error
+    );
+
+    alert(
+      'Something went wrong. Check the console for details.'
+    );
   }
 });
 
 
-// Skill recommendation
+// ==========================================
+// SKILL RECOMMENDATION
+// ==========================================
 
 async function getSkillRecommendations(studentData) {
+
   try {
-    const recommendationData = {
-      Age: studentData.Age,
-      Gender: studentData.Gender === 1 ? "Male" : "Female",
-      CGPA: studentData.CGPA,
-      Internships: studentData.Internships,
-      Projects: studentData.Projects,
-      Coding_Skills: studentData.Coding_Skills,
-      Communication_Skills: studentData.Communication_Skills,
-      Aptitude_Test_Score: studentData.Aptitude_Test_Score,
-      Soft_Skills_Rating: studentData.Soft_Skills_Rating,
-      Certifications: studentData.Certifications,
-      Backlogs: studentData.Backlogs,
-
-      Branch:
-        studentData.Branch_Civil === 1 ? "Civil" :
-        studentData.Branch_ECE === 1 ? "ECE" :
-        studentData.Branch_IT === 1 ? "IT" :
-        "ME",
-
-      Degree:
-        studentData.Degree_BTech === 1 ? "B.Tech" :
-        studentData.Degree_BCA === 1 ? "BCA" :
-        "MCA"
-    };
 
     const response = await fetch(
       'https://placement-prediction-y29i.onrender.com/recommend-skills',
       {
         method: 'POST',
+
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(recommendationData)
+
+        body: JSON.stringify(studentData)
       }
     );
 
+
     if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
       console.error(
         'Skill recommendation server returned:',
         response.status
       );
+
+      console.error(
+        'Server response:',
+        errorText
+      );
+
       return [];
     }
 
-    const data = await response.json();
+
+    const data =
+      await response.json();
+
+    console.log(
+      'Skill recommendation response:',
+      data
+    );
+
 
     return data.recommendations || [];
 
+
   } catch (error) {
-    console.error('Skill recommendation failed:', error);
+
+    console.error(
+      'Skill recommendation failed:',
+      error
+    );
+
     return [];
   }
 }
+
