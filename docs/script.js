@@ -165,7 +165,7 @@ async function getSkillRecommendations(studentData) {
   try {
 
     const response = await fetch(
-      'https://placement-prediction-y29i.onrender.com/recommend-skills',
+      'https://placement-prediction-c69p.onrender.com/recommend-skills',
       {
         method: 'POST',
 
