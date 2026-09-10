@@ -1,13 +1,19 @@
-from google.genai import types
-from pydantic import BaseModel
-from google import genai
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from google import genai
+from google.genai import types
 import joblib
 import pandas as pd
 
+
 app = FastAPI()
+
+
+# ==========================================
+# CORS
+# ==========================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,9 +22,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ==========================================
+# LOAD ML MODEL
+# ==========================================
+
 model = joblib.load("rf_model.pkl")
 scaler = joblib.load("scaler.pkl")
 
+
+# ==========================================
+# STUDENT DATA MODEL
+# ==========================================
 
 class Student(BaseModel):
     Age: int
@@ -35,6 +50,11 @@ class Student(BaseModel):
     Branch: str
     Degree: str
 
+
+# ==========================================
+# AI RESPONSE MODEL
+# ==========================================
+
 class AIAnalysis(BaseModel):
     summary: str
     strengths: list[str]
@@ -42,20 +62,28 @@ class AIAnalysis(BaseModel):
     actions: list[str]
 
 
+# ==========================================
+# PLACEMENT PREDICTION
+# ==========================================
+
 @app.post("/predict")
 def predict(student: Student):
 
+    # Encode Gender
     gender = 1 if student.Gender == "Male" else 0
 
+    # Encode Branch
     branch_civil = 1 if student.Branch == "Civil" else 0
     branch_ece = 1 if student.Branch == "ECE" else 0
     branch_it = 1 if student.Branch == "IT" else 0
     branch_me = 1 if student.Branch == "ME" else 0
 
+    # Encode Degree
     degree_btech = 1 if student.Degree == "B.Tech" else 0
     degree_bca = 1 if student.Degree == "BCA" else 0
     degree_mca = 1 if student.Degree == "MCA" else 0
 
+    # Create feature dataframe in the same order used during training
     student_data = pd.DataFrame([{
         "Age": student.Age,
         "Gender": gender,
@@ -77,59 +105,93 @@ def predict(student: Student):
         "Degree_MCA": degree_mca
     }])
 
+    # Scale the features
     scaled_data = scaler.transform(student_data)
 
+    # Generate prediction
     prediction = model.predict(scaled_data)
     probability = model.predict_proba(scaled_data)
-
 
     return {
         "prediction": "Placed" if prediction[0] == 1 else "Not Placed",
         "probability": float(probability[0][1])
     }
 
-    # ===== Skill Recommender=====
+
+# ==========================================
+# SKILL RECOMMENDER
+# ==========================================
 
 def get_skill_recommendations(student: Student):
+
     recommendations = []
 
     if student.CGPA < 7:
-        recommendations.append("Focus on improving your CGPA — aim for consistent performance above 7.0")
+        recommendations.append(
+            "Focus on improving your CGPA — aim for consistent performance above 7.0"
+        )
 
     if student.Coding_Skills < 7:
-        recommendations.append("Practice coding daily on platforms like LeetCode or HackerRank")
+        recommendations.append(
+            "Practice coding daily on platforms like LeetCode or HackerRank"
+        )
 
     if student.Communication_Skills < 7:
-        recommendations.append("Join a public speaking or communication skills workshop")
+        recommendations.append(
+            "Join a public speaking or communication skills workshop"
+        )
 
     if student.Aptitude_Test_Score < 70:
-        recommendations.append("Practice aptitude tests — quantitative, logical, and verbal reasoning")
+        recommendations.append(
+            "Practice aptitude tests — quantitative, logical, and verbal reasoning"
+        )
 
     if student.Soft_Skills_Rating < 7:
-        recommendations.append("Work on teamwork and soft skills through group projects or clubs")
+        recommendations.append(
+            "Work on teamwork and soft skills through group projects or clubs"
+        )
 
     if student.Internships < 1:
-        recommendations.append("Apply for at least one internship to gain practical experience")
+        recommendations.append(
+            "Apply for at least one internship to gain practical experience"
+        )
 
     if student.Projects < 2:
-        recommendations.append("Build 2-3 solid projects to showcase on your resume")
+        recommendations.append(
+            "Build 2-3 solid projects to showcase on your resume"
+        )
 
     if student.Certifications < 1:
-        recommendations.append("Earn a relevant online certification (Coursera, Udemy, etc.)")
+        recommendations.append(
+            "Earn a relevant online certification (Coursera, Udemy, etc.)"
+        )
 
     if student.Backlogs > 0:
-        recommendations.append("Clear pending backlogs as a priority — they impact placement eligibility")
+        recommendations.append(
+            "Clear pending backlogs as a priority — they impact placement eligibility"
+        )
 
     if len(recommendations) == 0:
-        recommendations.append("Your profile looks strong across all areas — keep it up!")
+        recommendations.append(
+            "Your profile looks strong across all areas — keep it up!"
+        )
 
     return recommendations
 
 
 @app.post("/recommend-skills")
 def recommend_skills(student: Student):
+
     recommendations = get_skill_recommendations(student)
-    return {"recommendations": recommendations}
+
+    return {
+        "recommendations": recommendations
+    }
+
+
+# ==========================================
+# GEMINI AI CAREER ANALYSIS
+# ==========================================
 
 @app.post("/ai-analysis")
 def ai_analysis(student: Student):
@@ -139,11 +201,11 @@ def ai_analysis(student: Student):
     prompt = f"""
 You are a career guidance assistant for a college placement prediction platform.
 
-Analyze the following student's profile and provide realistic, personalized career guidance.
+Analyze the following student's profile and provide realistic, personalized
+career guidance.
 
 Student profile:
 - Age: {student.Age}
-- Gender: {student.Gender}
 - CGPA: {student.CGPA}
 - Internships: {student.Internships}
 - Projects: {student.Projects}
@@ -157,23 +219,40 @@ Student profile:
 - Degree: {student.Degree}
 
 Requirements:
+
 - Give an overall assessment in 2-3 sentences.
 - Give 4-6 meaningful strengths.
 - Give 3-5 meaningful areas to improve.
 - Give 3-5 practical next actions.
+
+Quality requirements:
+
 - Do not repeat the same fact or recommendation across multiple points.
-- Prioritize the most important observations instead of repeating numbers.
+- Every item must provide a distinct insight.
+- Do not restate the same metric in multiple items unless it adds a genuinely
+  different insight.
 - Base the response only on the information provided.
-- Do not invent achievements, experience, skills, qualifications, or career goals.
+- Do not invent achievements, experience, skills, qualifications, project
+  subjects, project types, internship types, or career goals.
+- Do not describe the projects or internships as technical unless that
+  information was explicitly provided.
 - Do not assume that the student's branch determines their desired career.
 - A student from a non-CS branch may pursue software, IT, data, analytics,
   automation, consulting, core engineering, or other technology roles.
-- Consider the student's demonstrated skills, projects, internships, aptitude,
-  communication, and academic performance when suggesting career directions.
+- Consider the student's demonstrated skills, academic profile, projects,
+  internships, aptitude, communication, and soft skills when suggesting
+  career directions.
 - Certifications and suggested skills should be relevant to the student's
-  demonstrated profile and should not be restricted to their academic branch.
-- Keep the guidance concise, practical, realistic, and suitable for college placements.
+  demonstrated profile and may support either domain-specific or
+  technology-oriented career paths.
+- Do not recommend a career direction solely because of the student's branch.
+- Use the student's actual numerical values when mentioning scores.
+- Keep the guidance concise, practical, realistic, and suitable for college
+  placement preparation.
+- Do not include stray words, unfinished phrases, or unrelated text.
+- Every item must be a complete, grammatically correct sentence.
 """
+
 
     response = client.models.generate_content(
         model="gemini-3.6-flash",
@@ -184,6 +263,9 @@ Requirements:
         )
     )
 
-    result = AIAnalysis.model_validate_json(response.text)
+    result = AIAnalysis.model_validate_json(
+        response.text
+    )
 
     return result.model_dump()
+
