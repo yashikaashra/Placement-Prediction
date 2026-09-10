@@ -1,3 +1,4 @@
+from google import genai
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -121,4 +122,48 @@ def get_skill_recommendations(student: Student):
 def recommend_skills(student: Student):
     recommendations = get_skill_recommendations(student)
     return {"recommendations": recommendations}
+
+@app.post("/ai-analysis")
+def ai_analysis(student: Student):
+
+    client = genai.Client()
+
+    prompt = f"""
+You are a career guidance assistant for a college placement prediction platform.
+
+Analyze this student's profile and give a concise, personalized career analysis.
+
+Student profile:
+- Age: {student.Age}
+- Gender: {student.Gender}
+- CGPA: {student.CGPA}
+- Internships: {student.Internships}
+- Projects: {student.Projects}
+- Coding Skills: {student.Coding_Skills}/10
+- Communication Skills: {student.Communication_Skills}/10
+- Aptitude Test Score: {student.Aptitude_Test_Score}/100
+- Soft Skills Rating: {student.Soft_Skills_Rating}/10
+- Certifications: {student.Certifications}
+- Backlogs: {student.Backlogs}
+- Branch: {student.Branch}
+- Degree: {student.Degree}
+
+Give:
+1. A 2-3 sentence overall assessment.
+2. The student's top 2 strengths.
+3. The student's top 2 areas to improve.
+4. Two practical actions they should take next.
+
+Do not invent achievements or information not provided.
+Keep the response supportive, realistic, and concise.
+"""
+
+    response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=prompt
+    )
+
+    return {
+        "analysis": response.text
+    }
 
